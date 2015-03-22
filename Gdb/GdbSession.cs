@@ -74,16 +74,10 @@ namespace MonoDevelop.Debugger.Gdb
 		const int CommandTimeout = 2500;
 
 		protected bool internalStop;
-		protected bool logGdb;
 			
 		protected object syncLock = new object ();
 		protected object eventLock = new object ();
 		protected object gdbLock = new object ();
-		
-		public GdbSession ()
-		{
-			logGdb = !string.IsNullOrEmpty (Environment.GetEnvironmentVariable ("MONODEVELOP_GDB_LOG")) || PropertyService.Get("LogGdb",false);
-		}
 		
 		protected override void OnRun (DebuggerStartInfo startInfo)
 		{
@@ -597,6 +591,14 @@ namespace MonoDevelop.Debugger.Gdb
 			return base.ResolveExpression (expression, location);
 		}
 
+		static void Log(string msg, params object[] o)
+		{
+			if (!System.Diagnostics.Debugger.IsLogging())
+				return;
+
+			System.Diagnostics.Debugger.Log (2, "gdb", string.Format (msg + Environment.NewLine, o));
+		}
+
 		public GdbCommandResult RunCommand (string command, params string[] args)
 		{
 			lock (gdbLock) {
@@ -609,8 +611,7 @@ namespace MonoDevelop.Debugger.Gdb
 
 					command = command + " " + string.Join (" ", args);
 
-					if (logGdb)
-						LoggingService.LogInfo ("gdb<: {0}",command);
+					Log("gdb<: {0}",command);
 
 					sin.WriteLine (command);
 					
@@ -659,8 +660,8 @@ namespace MonoDevelop.Debugger.Gdb
 		
 		protected virtual void ProcessOutput (string line)
 		{
-			if (logGdb)
-				LoggingService.LogInfo ("dbg>: {0}",line);
+			Log ("dbg>: {0}", line);
+
 			switch (line [0]) {
 				case '^':
 					lock (syncLock) {
