@@ -88,7 +88,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 				return false;
 			}
 
-			var funcDefinition = res.GetObject("memory").GetObject(0).GetValueString("contents");
+			var funcDefinition = res.GetObject("memory").GetObject(0).GetValue("contents");
 
 			var returnOffset = funcDefinition.IndexOf(DGdbSession.Is64Bit ? _eh_finddataSearchPattern_x64 : _eh_finddataSearchPattern_x86);
 			if (returnOffset < 0)

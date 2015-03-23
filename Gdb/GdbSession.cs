@@ -282,7 +282,7 @@ namespace MonoDevelop.Debugger.Gdb
 		{
 			SelectThread (activeThread);
 			GdbCommandResult res = RunCommand ("-stack-info-depth", "2");
-			if (res.GetValueString ("depth") == "1") {
+			if (res.GetValue ("depth") == "1") {
 				RunCommand ("-exec-continue");
 			} else {
 				RunCommand ("-stack-select-frame", "0");
@@ -369,13 +369,13 @@ namespace MonoDevelop.Debugger.Gdb
 			if (!string.IsNullOrEmpty (bp.ConditionExpression) && bp.BreakIfConditionChanges) {
 				// Update the condition expression
 				GdbCommandResult res = RunCommand ("-data-evaluate-expression", Escape (bp.ConditionExpression));
-				string val = res.GetValueString ("value");
+				string val = res.GetValue ("value");
 				RunCommand ("-break-condition", handle.ToString (), "(" + bp.ConditionExpression + ") != " + val);
 			}
 			
 			if (bp.HitAction == HitAction.PrintExpression) {
 				GdbCommandResult res = RunCommand ("-data-evaluate-expression", Escape (bp.TraceExpression));
-				string val = res.GetValueString ("value");
+				string val = res.GetValue ("value");
 				NotifyBreakEventUpdate (binfo, 0, val);
 				return false;
 			}
@@ -429,7 +429,7 @@ namespace MonoDevelop.Debugger.Gdb
 		{
 			foreach (BreakEventInfo bp in breakpointsWithHitCount) {
 				GdbCommandResult res = RunCommand ("-break-info", bp.Handle.ToString ());
-				string val = res.GetObject ("BreakpointTable").GetObject ("body").GetObject (0).GetObject ("bkpt").GetValueString ("ignore");
+				string val = res.GetObject ("BreakpointTable").GetObject ("body").GetObject (0).GetObject ("bkpt").GetValue ("ignore");
 				if (val != null)
 					NotifyBreakEventUpdate (bp, int.Parse (val), null);
 				else
@@ -552,8 +552,8 @@ namespace MonoDevelop.Debugger.Gdb
 					ResultData line_asm_insn = src_and_asm_line.GetObject ("line_asm_insn");
 					for (int i=0; i<line_asm_insn.Count; i++) {
 						ResultData asm = line_asm_insn.GetObject (i);
-						long addr = long.Parse (asm.GetValueString ("address").Substring (2), NumberStyles.HexNumber);
-						string code = asm.GetValueString ("inst");
+						long addr = long.Parse (asm.GetValue ("address").Substring (2), NumberStyles.HexNumber);
+						string code = asm.GetValue ("inst");
 						lines.Add (new AssemblyLine (addr, code, newLine));
 					}
 				}
@@ -685,7 +685,7 @@ namespace MonoDevelop.Debugger.Gdb
 					lock (eventLock) {
 						running = false;
 						ev = new GdbEvent (line);
-						string ti = ev.GetValueString ("thread-id");
+						string ti = ev.GetValue ("thread-id");
 						if (ti != null && ti != "all")
 							currentThread = activeThread = int.Parse (ti);
 						Monitor.PulseAll (eventLock);
@@ -724,7 +724,7 @@ namespace MonoDevelop.Debugger.Gdb
 					}
 					break;
 				case "signal-received":
-					if (ev.GetValueString ("signal-name") == "SIGINT")
+					if (ev.GetValue ("signal-name") == "SIGINT")
 						type = TargetEventType.TargetInterrupted;
 					else
 						type = TargetEventType.TargetSignaled;

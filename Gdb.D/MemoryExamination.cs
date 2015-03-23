@@ -269,7 +269,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 				return false;
 			}
 
-			data = Misc.ArrayConversionHelpers.HexStringToByteArray (res.GetObject("memory").GetObject(0).GetValueString ("contents"));
+			data = Misc.ArrayConversionHelpers.HexStringToByteArray (res.GetObject("memory").GetObject(0).GetValue ("contents"));
 			return true;
 		}
 

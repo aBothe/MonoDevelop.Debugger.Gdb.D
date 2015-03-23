@@ -90,17 +90,17 @@ namespace MonoDevelop.Debugger.Gdb.D
 		protected override StackFrame CreateFrame(ResultData frameData)
 		{
 			string lang = "D";
-			string func = frameData.GetValueString("func");
-			string sadr = frameData.GetValueString("addr");
+			string func = frameData.GetValue("func");
+			string sadr = frameData.GetValue("addr");
 
 			int line;
-			int.TryParse(frameData.GetValueString("line"),out line);
+			int.TryParse(frameData.GetValue("line"),out line);
 
-			string sfile = frameData.GetValueString("fullname");
+			string sfile = frameData.GetValue("fullname");
 			if (sfile == null)
-				sfile = frameData.GetValueString("file");
+				sfile = frameData.GetValue("file");
 			if (sfile == null)
-				sfile = frameData.GetValueString("from");
+				sfile = frameData.GetValue("from");
 
 			if (sfile != null) {
 				var m = mixinInlineRegex.Match (sfile);
@@ -148,10 +148,10 @@ namespace MonoDevelop.Debugger.Gdb.D
 			if (res.Status != CommandStatus.Done)
 				return null;
 
-			return ConstructBacktraceSymbol (s, res.GetValueString ("value"), arg);
+			return ConstructBacktraceSymbol (s, res.GetValue ("value"), arg);
 		}
 
-		protected override ObjectValue CreateVarObject(string exp, EvaluationOptions opt)
+		protected ObjectValue CreateVarObject(string exp, EvaluationOptions opt)
 		{
 			session.SelectThread(threadId);
 			return BacktraceHelper.CreateObjectValue(exp, opt);
@@ -160,7 +160,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 		/// <summary>
 		/// Used when viewing variable contents in the dedicated window in MonoDevelop.
 		/// </summary>
-		public override object GetRawValue (ObjectPath path, EvaluationOptions options)
+		public object GetRawValue (ObjectPath path, EvaluationOptions options)
 		{
 			return null;
 		}
@@ -301,7 +301,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 				var res = session.RunCommand("-stack-list-arguments", "1", currentFrame.ToString(), currentFrame.ToString());
 				foreach (ResultData data in res.GetObject("stack-args").GetObject(0).GetObject("frame").GetObject("args"))
 				{
-					yield return ConstructBacktraceSymbol (data.GetValueString("name"), data.GetValueString("value"));
+					yield return ConstructBacktraceSymbol (data.GetValue("name"), data.GetValue("value"));
 				}
 			}
 		}
@@ -311,7 +311,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 			get { 
 				var res = session.RunCommand ("-stack-list-locals", "--skip-unavailable", "1");
 				foreach (ResultData data in res.GetObject ("locals")) {
-					yield return ConstructBacktraceSymbol (data.GetValueString("name"), data.GetValueString("value"));
+					yield return ConstructBacktraceSymbol (data.GetValue("name"), data.GetValue("value"));
 				}
 			}
 		}

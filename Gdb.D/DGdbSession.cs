@@ -56,7 +56,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 			// Determine client architecture -- Might be important on Windows when the x86 compatibility layer is active
 			var res = RunCommand ("-data-evaluate-expression","sizeof(void*)");
 			if (res != null)
-				Is64Bit = res.GetValueString ("value") == "8"; // Are pointers 8 bytes long? Then it's 64 bit, obviously.
+				Is64Bit = res.GetValue ("value") == "8"; // Are pointers 8 bytes long? Then it's 64 bit, obviously.
 			else
 				Is64Bit = Environment.Is64BitOperatingSystem;
 
@@ -76,7 +76,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 			return new Backtrace (bt);
 		}
 
-		protected override void FireTargetEvent (TargetEventType type, ResultData curFrame)
+		protected void FireTargetEvent (TargetEventType type, ResultData curFrame)
 		{
 			UpdateHitCountData ();
 

@@ -40,15 +40,15 @@ namespace MonoDevelop.Debugger.Gdb
 			public DateTime LastCheck;
 			public bool IsExe;
 		}
-		
+
 		Dictionary<string,FileData> fileCheckCache = new Dictionary<string, FileData> ();
-		
+
 		public override bool CanDebugCommand (ExecutionCommand command)
 		{
 			NativeExecutionCommand cmd = command as NativeExecutionCommand;
 			if (cmd == null)
 				return false;
-			
+
 			string file = FindFile (cmd.Command);
 			if (!File.Exists (file)) {
 				// The provided file is not guaranteed to exist. If it doesn't
@@ -57,10 +57,10 @@ namespace MonoDevelop.Debugger.Gdb
 				// command will build the project if the exec doesn't yet exist.
 				return true;
 			}
-			
+
 			file = Path.GetFullPath (file);
 			DateTime currentTime = File.GetLastWriteTime (file);
-				
+
 			FileData data;
 			if (fileCheckCache.TryGetValue (file, out data)) {
 				if (data.LastCheck == currentTime)
@@ -75,7 +75,7 @@ namespace MonoDevelop.Debugger.Gdb
 			fileCheckCache [file] = data;
 			return data.IsExe;
 		}
-		
+
 		public override DebuggerStartInfo CreateDebuggerStartInfo (ExecutionCommand command)
 		{
 			NativeExecutionCommand pec = (NativeExecutionCommand) command;
@@ -89,7 +89,7 @@ namespace MonoDevelop.Debugger.Gdb
 			}
 			return startInfo;
 		}
-		
+
 		public bool IsExecutable (string file)
 		{
 			// HACK: this is a quick but not very reliable way of checking if a file
@@ -113,8 +113,8 @@ namespace MonoDevelop.Debugger.Gdb
 			GdbSession ds = new GdbSession ();
 			return ds;
 		}
-		
-		public override ProcessInfo[] GetAttachableProcesses ()
+
+		public ProcessInfo[] GetAttachableProcesses ()
 		{
 			List<ProcessInfo> procs = new List<ProcessInfo> ();
 			foreach (string dir in Directory.GetDirectories ("/proc")) {
@@ -133,7 +133,7 @@ namespace MonoDevelop.Debugger.Gdb
 			}
 			return procs.ToArray ();
 		}
-		
+
 		string FindFile (string cmd)
 		{
 			if (Path.IsPathRooted (cmd))

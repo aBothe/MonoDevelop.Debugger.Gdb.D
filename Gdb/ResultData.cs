@@ -33,10 +33,10 @@ namespace MonoDevelop.Debugger.Gdb
 {
 	class ResultData: IEnumerable
 	{
-		protected Hashtable props;
+		Hashtable props;
 		object[] array;
 		bool isArrayProperty;
-		
+
 		public int Count {
 			get {
 				if (array != null)
@@ -47,49 +47,33 @@ namespace MonoDevelop.Debugger.Gdb
 					return 0;
 			}
 		}
-		
-		public object GetValue (string name)
-		{
-			return props [name];
-		}
 
-		public string GetValueString(string name)
+		public string GetValue (string name)
 		{
 			var o = props [name];
 			return o as string ?? (o == null ? null : o.ToString ());
 		}
-		
+
 		public int GetInt (string name)
 		{
-			return int.Parse (GetValueString (name));
+			return int.Parse (GetValue (name));
 		}
 
-		public int GetInt (int index)
+		public string GetValue (int index)
 		{
-			return int.Parse (GetValueString (index));
-		}
-		
-		public object GetValue (int index)
-		{
-			return array [index];
+			return (string) array [index];
 		}
 
-		public string GetValueString(int index)
-		{
-			var o = array [index];
-			return o as string ?? (o == null ? null : o.ToString ());
-		}
-		
 		public ResultData GetObject (string name)
 		{
 			return (ResultData) props [name];
 		}
-		
+
 		public ResultData GetObject (int index)
 		{
 			return (ResultData) array [index];
 		}
-		
+
 		public object[] GetAllValues (string name)
 		{
 			object ob = props [name];
@@ -101,22 +85,22 @@ namespace MonoDevelop.Debugger.Gdb
 			else
 				return new object[] { ob };
 		}
-					
+
 		protected void ReadResults (string str, int pos)
 		{
 			ReadTuple (str, ref pos, this);
 		}
-		
+
 		void ReadResult (string str, ref int pos, out string name, out object value)
 		{
 			name = null;
 			value = null;
-			
+
 			name = ReadString (str, '=', ref pos);
 			ReadChar (str, ref pos, '=');
 			value = ReadValue (str, ref pos);
 		}
-		
+
 		string ReadString (string str, char term, ref int pos)
 		{
 			StringBuilder sb = new StringBuilder ();
@@ -131,7 +115,7 @@ namespace MonoDevelop.Debugger.Gdb
 			}
 			return sb.ToString ();
 		}
-		
+
 		object ReadValue (string str, ref int pos)
 		{
 			if (str [pos] == '"') {
@@ -150,7 +134,7 @@ namespace MonoDevelop.Debugger.Gdb
 				pos++;
 				return ReadArray (str, ref pos);
 			}
-			
+
 			// Single value tuple
 			string name;
 			object val;
@@ -160,12 +144,12 @@ namespace MonoDevelop.Debugger.Gdb
 			sdata.props [name] = val;
 			return sdata;
 		}
-		
+
 		void ReadTuple (string str, ref int pos, ResultData data)
 		{
 			if (data.props == null)
 				data.props = new Hashtable ();
-			
+
 			while (pos < str.Length && str [pos] != '}') {
 				string name;
 				object val;
@@ -193,7 +177,7 @@ namespace MonoDevelop.Debugger.Gdb
 			}
 			TryReadChar (str, ref pos, '}');
 		}
-		
+
 		ResultData ReadArray (string str, ref int pos)
 		{
 			ArrayList list = new ArrayList ();
@@ -207,13 +191,13 @@ namespace MonoDevelop.Debugger.Gdb
 			arr.array = list.ToArray ();
 			return arr;
 		}
-		
+
 		void ReadChar (string str, ref int pos, char c)
 		{
 			if (!TryReadChar (str, ref pos, c))
 				ThrownParseError (str, pos);
 		}
-		
+
 		bool TryReadChar (string str, ref int pos, char c)
 		{
 			if (pos >= str.Length || str [pos] != c)
@@ -221,7 +205,7 @@ namespace MonoDevelop.Debugger.Gdb
 			pos++;
 			return true;
 		}
-		
+
 		void ThrownParseError (string str, int pos)
 		{
 			if (pos > str.Length)

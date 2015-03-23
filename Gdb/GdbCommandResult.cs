@@ -33,7 +33,7 @@ namespace MonoDevelop.Debugger.Gdb
 	{
 		public CommandStatus Status;
 		public string ErrorMessage;
-		
+
 		public GdbCommandResult (string line)
 		{
 			if (line.StartsWith ("^done")) {
@@ -43,7 +43,7 @@ namespace MonoDevelop.Debugger.Gdb
 				Status = CommandStatus.Error;
 				if (line.Length > 7) {
 					ReadResults (line, 7);
-					ErrorMessage = GetValueString ("msg");
+					ErrorMessage = GetValue ("msg");
 				}
 			} else if (line.StartsWith ("^running")) {
 				Status = CommandStatus.Running;
