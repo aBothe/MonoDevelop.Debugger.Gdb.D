@@ -40,11 +40,12 @@ namespace MonoDevelop.Debugger.Gdb
 		StackFrame firstFrame;
 		protected GdbSession session;
 		DissassemblyBuffer[] disBuffers;
-		protected int currentFrame = -1;
+		public int CurrentFrameIndex { get; private set;}
 		protected long threadId;
 
 		public GdbBacktrace (GdbSession session, long threadId, int count, ResultData firstFrame)
 		{
+			CurrentFrameIndex = -1;
 			fcount = count;
 			this.threadId = threadId;
 			if (firstFrame != null)
@@ -293,9 +294,9 @@ namespace MonoDevelop.Debugger.Gdb
 		protected void SelectFrame (int frame)
 		{
 			session.SelectThread (threadId);
-			if (frame != currentFrame) {
+			if (frame != CurrentFrameIndex) {
 				session.RunCommand ("-stack-select-frame", frame.ToString ());
-				currentFrame = frame;
+				CurrentFrameIndex = frame;
 			}
 		}
 
@@ -359,12 +360,12 @@ namespace MonoDevelop.Debugger.Gdb
 			return buffer.GetLines (firstLine, firstLine + count - 1);
 		}
 
-		public object GetRawValue (ObjectPath path, EvaluationOptions options)
+		public virtual object GetRawValue (ObjectPath path, EvaluationOptions options)
 		{
 			return null;
 		}
 
-		public void SetRawValue (ObjectPath path, object value, EvaluationOptions options)
+		public virtual void SetRawValue (ObjectPath path, object value, EvaluationOptions options)
 		{
 		}
 	}

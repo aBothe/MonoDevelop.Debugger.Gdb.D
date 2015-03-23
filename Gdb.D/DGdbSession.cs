@@ -76,7 +76,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 			return new Backtrace (bt);
 		}
 
-		protected void FireTargetEvent (TargetEventType type, ResultData curFrame)
+		protected override void FireTargetEvent (TargetEventType type, ResultData curFrame)
 		{
 			UpdateHitCountData ();
 

@@ -50,7 +50,6 @@ namespace MonoDevelop.Debugger.Gdb.D
 		/*
 		List<string>[] VariableNameCache;
 		List<string>[] ParameterNameCache;*/
-		public int CurrentFrameIndex;
 		public readonly DLocalExamBacktrace BacktraceHelper;
 		//public readonly VariableValueExamination Variables;
 
@@ -160,7 +159,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 		/// <summary>
 		/// Used when viewing variable contents in the dedicated window in MonoDevelop.
 		/// </summary>
-		public object GetRawValue (ObjectPath path, EvaluationOptions options)
+		public override object GetRawValue (ObjectPath path, EvaluationOptions options)
 		{
 			return null;
 		}
@@ -298,7 +297,7 @@ namespace MonoDevelop.Debugger.Gdb.D
 		public IEnumerable<IDBacktraceSymbol> Parameters
 		{
 			get {
-				var res = session.RunCommand("-stack-list-arguments", "1", currentFrame.ToString(), currentFrame.ToString());
+				var res = session.RunCommand("-stack-list-arguments", "1", CurrentFrameIndex.ToString(), CurrentFrameIndex.ToString());
 				foreach (ResultData data in res.GetObject("stack-args").GetObject(0).GetObject("frame").GetObject("args"))
 				{
 					yield return ConstructBacktraceSymbol (data.GetValue("name"), data.GetValue("value"));
